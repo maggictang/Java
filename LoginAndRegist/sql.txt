@@ -1,0 +1,9 @@
+create database wuan;
+
+use  wuan;
+
+create table user (
+nickname varchar(20),
+name varchar(20),
+password varchar(20)
+);
