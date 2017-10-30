@@ -3,7 +3,9 @@ package server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -40,6 +42,13 @@ public class ChatServer {
 						c.send(name + msg);
 					}
 				}
+			} catch(EOFException e) {
+				try {
+					dis.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				System.out.println("一个用户退出");
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
@@ -80,14 +89,11 @@ public class ChatServer {
 				new Thread(cs,"用户" + num + ":").start();
 				clients.add(cs);
 			}
+		} catch(BindException  e) {
+			System.out.println("端口已被占用，请清理相关应用，在重启服务器");
+			System.exit(-1);
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				sSocket.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
