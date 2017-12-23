@@ -6,8 +6,8 @@ package adapter;
  */
 public interface UsbTarget {
 	/**
-	 * 处理键盘打字
+	 * 处理接收键盘的字符串，将其打印到电脑上
 	 */
-	public void handlePrint();
+	public void handleType(String str);
 
 }

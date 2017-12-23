@@ -6,9 +6,9 @@ package adapter;
  */
 public class KeyBoard {
 	/**
-	 * 键盘的功能：能打字
+	 * 键盘的功能：产生一个字符串
 	 */
-	public void print() {
-		System.out.println("键盘的打字功能");
+	public String type() {
+		return "这是一个字符串";
 	}
 }

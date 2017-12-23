@@ -5,8 +5,8 @@ package adapter;
  *
  */
 public class Clinet {
-	public static void mainn(String[] args) {
+	public static void main(String[] args) {
 		UsbTarget t = new Adapter(); 
-		t.handlePrint();
+		t.handleType(new KeyBoard().type());
 	}
 } 

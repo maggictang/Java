@@ -5,13 +5,10 @@ package adapter;
  *
  */
 public class Adapter implements UsbTarget {
-	
-	KeyBoard kb = new KeyBoard();
-	
-	@Override
-	public void handlePrint() {
-		// TODO 自动生成的方法存根
-		kb.print();
-	}
 
+	@Override
+	public void handleType(String str) {
+		System.out.println(str);
+		
+	}
 }
