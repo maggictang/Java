@@ -27,10 +27,11 @@ public class LoginFilter implements Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse resp = (HttpServletResponse) response;
 		HttpSession session = req.getSession();
-		String user =(String) session.getAttribute("user");
+		User user = (User) session.getAttribute("user");
 		
 		if(user == null) {
-			resp.sendRedirect("login.jsp");
+			req.setAttribute("msg", "ÓÃ»§ÉÐÎ´µÇÂ¼");
+			req.getRequestDispatcher("login.jsp").forward(req, resp);
 			return;
 		}
 		chain.doFilter(request, response);

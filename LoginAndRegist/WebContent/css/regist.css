@@ -1,0 +1,37 @@
+@charset "UTF-8";
+body {
+	background-color: PowderBlue;
+	text-align: center;
+}
+.div1 div {
+	margin-top: 5px;
+}
+.div1 input {
+	width: 150px;
+}
+
+.div1 span {
+	display:inline-block; 
+	width:80px;
+}
+
+.div2 {
+	text-align: center;
+	margin-bottom: 10px;
+}
+.div2 input {
+	margin-top: 10px;
+	margin-left	: 35px;
+	width: 50px;
+}
+.div3 {
+	margin-top: 5px;
+}
+.div3 input {
+	width: 150px;
+}
+
+.div3 span {
+	display:inline-block; 
+	width:80px;
+}

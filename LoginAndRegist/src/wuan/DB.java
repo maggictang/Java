@@ -1,170 +1,113 @@
 package wuan;
 
 import java.sql.*;
-//数据库有三个字段nickname 昵称，name 用户名，password 密码
+
 public class DB {
+	
+	private String url ="jdbc:mysql://localhost/wuan?useSSL=false";
+	private String user = "root";
+	private String password = "123456";
+	
+	private Connection c = null;
+	private PreparedStatement ps = null;
+	private Statement s = null;
 	/**
-	 * 连接数据库
-	 */	
-	public static Connection connectDB() {
-		
-		String url = "jdbc:mysql://localhost:3306/wuan?characterEncoding=utf8&useSSL=true";
-		String user = "root";
-		String psd = "123456";
-		
-		Connection c = null;
-		
-		try {
-		Class.forName("com.mysql.jdbc.Driver");
-		c = DriverManager.getConnection(url,user,psd);
-		} catch(ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch(SQLException e) {
-			e.printStackTrace(); 
-		}
-		
-		return c;
-	}
-	/**
-	 * 关闭资源
+	 * 构造一个与数据库连接的对象
 	 */
-	public static void close(Connection cc,Statement ss) {
-		
-		Connection c = cc;
-		Statement s = ss;
-		
+	public DB() {
 		try {
-			if(s != null) {
-				s.close();
-				s = null;
-			}
-			if(c != null) {
-				c.close();
-				c = null;
-			}
-		} catch(SQLException e) {
+			Class.forName("com.mysql.jdbc.Driver");
+			c = DriverManager.getConnection(url, user, password);		
+		} catch (ClassNotFoundException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO 自动生成的 catch 块
 			e.printStackTrace();
 		}
 	}
 	/**
-	 * 关闭资源的重载方法
+	 * 注册用户，成功返回true,失败返回false
 	 */
-public static void close(Connection cc,Statement ss,ResultSet rrs) {
-		
-		Connection c = cc;
-		Statement s = ss;
-		ResultSet rs = rrs;
-		
+	public boolean registUser(User user) {
+		String sql = "insert into myuser (uname,psd) values (?,?)";
 		try {
-			if(rs != null) {
-				rs.close();
-				rs = null;
-			}
-			if(s != null) {
-				s.close();
-				s = null;
-			}
-			if(c != null) {
-				c.close();
-				c = null;
-			}
-		} catch(SQLException e) {
-			e.printStackTrace();
-		}
-	}
-	/**
-	 * 往数据库添加用户
-	 * @param nickname 昵称
-	 * @param user 用户名
-	 * @param password 密码
-	 */
-	public static void addUser(String nickname,String user,String password) {
-		
-		PreparedStatement ps = null;
-		String sql = "insert into user values(?,?,?);";
-		Connection c = DB.connectDB();
-		
-		try {
-			c.setAutoCommit(false);
 			ps = c.prepareStatement(sql);
-			ps.setString(1, nickname);
-			ps.setString(2,user);
-			ps.setString(3,password);
-			ps.executeUpdate();
-			c.commit();
-			c.setAutoCommit(true);
-		} catch(SQLException e) {
+			ps.setString(1, user.getUname());
+			ps.setString(2, user.getPsd());
+			ps.execute();
+			return true;
+		} catch (SQLException e) {
+			// TODO 自动生成的 catch 块
 			e.printStackTrace();
-		} finally {
-			close(c,ps);
-		}
-	}
-	/**
-	 * 登录时验证用户是否存在,存在返回true,否则false
-	 * 注册时验证用户是否已被注册,已被注册返回true,否则false
-	 * @param user 用户名
-	 */
-	public static boolean existUser(String user) {
-		
-		Connection c = connectDB();
-		Statement s = null;
-		//在数据库中查找name为参数user的记录 
-		String sql = "select * from user where name = '" + user +"'";
-		ResultSet rs = null;
-		//标志位：判断用户是否存在,存在true,不存在false
-		boolean exist = false;
-		
-		try {
-			s = c.createStatement();
-			rs = s.executeQuery(sql);
-			if(rs.next()) {
-				exist = true;
-			} else {
-				exist = false;
-			}
-		} catch(SQLException e) {
-			e.printStackTrace();
-		} finally {
-			close(c,s,rs);
+			return false;
 		}
 		
-		return exist;
 	}
 	/**
-	 * 登录时检查用户名和密码是否匹配
+	 * 判断用户名是否已被注册，已存在返回true,不存在返回false
 	 */
-	public static boolean truePsd(String user,String psd) {
-		
-		Connection c = connectDB();
-		Statement s = null;
-		ResultSet rs = null;
-		//查找用户名为user的密码
-		String sql = "select password from user where name = '" + user + "'";
-		//标志位，判断用户名和密码是否匹配，正确true，错误false
-		boolean truePsd = false;
-		
+	public boolean isExistUser(User user) {
+		String sql = "select uname from myuser where uname = " + "\"" + user.getUname() + "\"";
+		boolean isExistUser = false;
 		try {
 			s = c.createStatement();
-			rs = s.executeQuery(sql);
-			//如结果集有结果，进入if，没有进入else
+			ResultSet rs = s.executeQuery(sql);
 			if(rs.next()) {
-				//如果结果集的密码与传入的密码相等返回true，否则返回false
-				if(rs.getString("password").equals(psd) == true) {
-					return true;
-				} else {
-					return false;
+				isExistUser = true;
+				if(rs!=null) {
+					rs.close();
 				}
-			} else {
-				return false;
 			}
-			
-			} catch(SQLException e) {
-				e.printStackTrace();	
-			} finally {
-				close(c,s,rs);
+			else {
+				isExistUser = false;
 			}
-		return truePsd;
+		} catch (SQLException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
+		return isExistUser;
+	}
+	/**
+	 * 密码是否正确
+	 */
+	public boolean psdIsTrue(User user) {
+		String sql = "select psd from myuser where uname = " + "\"" +user.getUname() + "\"";
+		try {
+			s = c.createStatement();
+			ResultSet rs = s.executeQuery(sql);
+			if(rs.next()) {
+				String psd = rs.getString("psd");
+				System.out.println(psd);
+				if(user.getPsd().equals(psd)) {
+					return true;
+				}
+			}
+			return false;
+		} catch (SQLException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+			return false;
+		}
 		
-		
+	}
+	/**
+	 * 关闭与数据库连接
+	 */
+  	public void closeConnection() {
+		try {
+			if(s != null) {
+				s.close();
+			}
+			if(ps != null) {
+				ps.close();
+			}
+			if(c != null) {
+				c.close();
+			}	
+		} catch (SQLException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
 	}
 }

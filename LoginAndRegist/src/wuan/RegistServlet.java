@@ -7,79 +7,50 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import wuan.DB;
+public class RegistServlet extends HttpServlet {
 
-public class RegistServlet extends HttpServlet{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = -7294844092044548985L;
+
 	@Override
-	
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		//设置编码方式
+		req.setCharacterEncoding("utf-8");
+		resp.setCharacterEncoding("utf-8");
+		//获得用户名，密码，创建一个User对象
+		String uname = req.getParameter("uname");
+		String psd = req.getParameter("psd");	
+		User user = new User(uname,psd);
+		DB db = new DB();
+		//判断用户名是否已存在
+		if(db.isExistUser(user)) {
+			//存在,提示已存在
+			db.closeConnection();
+			req.setAttribute("msg", "该用户已存在");  
+			req.getRequestDispatcher("regist.jsp").forward(req,resp); 
+		}
+		else {
+			//不存在，去注册
+			//判断是否成功在数据库注册
+			if(db.registUser(user)) {
+				//成功跳转登录界面
+				db.closeConnection();
+				req.setAttribute("msg", "注册成功，请登录");
+				req.getRequestDispatcher("login.jsp").forward(req,resp); 
+			}
+			else {
+				db.closeConnection();
+				req.setAttribute("msg", "注册失败，请重新尝试");
+				req.getRequestDispatcher("regist.jsp").forward(req,resp); 
+				//注册失败
+			}
+		}
 		
-		req.setCharacterEncoding("UTF-8");
-		/**
-		 * 接收regist.jsp传过来的参数，
-		 * @parm user 用户名
-		 * @param nickname 昵称
-		 * @param password 密码
-		 * @param repassword 确认密码
-		 */
-		String user = req.getParameter("user");
-		String nickname = req.getParameter("nickname");
-		String password = req.getParameter("password");
-		String repassword = req.getParameter("repassword");
-		
-		//用户名不能为空
-		if(user =="" || user == null) {
-			  req.setAttribute("msg", "用户名不能为空！");  
-	          req.getRequestDispatcher("/regist.jsp").forward(req, resp);  
-			return;
-		}
-		//昵称不能为空
-		else if(nickname =="" || nickname == null) {
-			  req.setAttribute("msg", "昵称不能为空！");  
-	          req.getRequestDispatcher("/regist.jsp").forward(req, resp);  
-			return;
-		}
-		//密码不能为空
-		else if(password =="" || password == null) {
-			  req.setAttribute("msg", "密码不能为空！");  
-	          req.getRequestDispatcher("/regist.jsp").forward(req, resp);  
-			return;
-		}
-		//确认密码不能为空
-		else if(repassword =="" || repassword == null) {
-			  req.setAttribute("msg", "请输确认密码！");  
-	          req.getRequestDispatcher("/regist.jsp").forward(req, resp);  
-			return;
-		}
-		//两次密码要相同
-		else if(password.equals(repassword) == false) {
-			  req.setAttribute("msg", "两次密码不一致！");  
-	          req.getRequestDispatcher("/regist.jsp").forward(req, resp);  
-			return;
-		}
-		//注册时判断用户名是否已经存在，存在则不让注册
-		else if(DB.existUser(user) == true) {
-			  req.setAttribute("msg", "该用户名已存在！！");  
-			  req.getRequestDispatcher("/regist.jsp").forward(req, resp);  
-			  return;
-		}
-		//调用方法注册用户
-		else {	
-			DB.addUser(nickname,user,password);
-			req.setAttribute("msg", "注册成功！恭喜你成为一名煎饼侠！赶快登录看看吧！");
-			req.getRequestDispatcher("/login.jsp").forward(req, resp); 		
-		}
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		
-		doGet(req, resp);
-		
+		// TODO 自动生成的方法存根
+		this.doGet(req, resp);
 	}
+	
 }
